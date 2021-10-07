@@ -10,7 +10,9 @@ import requests
 from airbyte_cdk.sources import AbstractSource
 from airbyte_cdk.sources.streams import Stream
 from airbyte_cdk.sources.streams.http import HttpStream
-from airbyte_cdk.sources.streams.http.auth import TokenAuthenticator
+from airbyte_cdk.sources.streams.http.requests_native_auth import TokenAuthenticator
+
+import re
 
 """
 TODO: Most comments in this class are instructive and should be deleted after the source is implemented.
@@ -56,9 +58,11 @@ class ScorebuddyStream(HttpStream, ABC):
     """
 
     # TODO: Fill in the url base. Required.
-    url_base = "https://example-api.com/v1/"
+    url_base = "www.cloud.scorebuddy.co.uk/"
 
-    def next_page_token(self, response: requests.Response) -> Optional[Mapping[str, Any]]:
+    def next_page_token(
+        self, response: requests.Response
+    ) -> Optional[Mapping[str, Any]]:
         """
         TODO: Override this method to define a pagination strategy. If you will not be using pagination, no action is required - just return None.
 
@@ -76,7 +80,10 @@ class ScorebuddyStream(HttpStream, ABC):
         return None
 
     def request_params(
-        self, stream_state: Mapping[str, Any], stream_slice: Mapping[str, any] = None, next_page_token: Mapping[str, Any] = None
+        self,
+        stream_state: Mapping[str, Any],
+        stream_slice: Mapping[str, any] = None,
+        next_page_token: Mapping[str, Any] = None,
     ) -> MutableMapping[str, Any]:
         """
         TODO: Override this method to define any query parameters to be set. Remove this method if you don't need to define request params.
@@ -84,7 +91,9 @@ class ScorebuddyStream(HttpStream, ABC):
         """
         return {}
 
-    def parse_response(self, response: requests.Response, **kwargs) -> Iterable[Mapping]:
+    def parse_response(
+        self, response: requests.Response, **kwargs
+    ) -> Iterable[Mapping]:
         """
         TODO: Override this method to define how a response is parsed.
         :return an iterable containing each record in the response
@@ -97,17 +106,24 @@ class Customers(ScorebuddyStream):
     TODO: Change class name to match the table/data source this stream corresponds to.
     """
 
+    def __init__(self, base: str, **kwargs):
+        super().__init__(**kwargs)
+        self.base = base
+
     # TODO: Fill in the primary key. Required. This is usually a unique field in the stream, like an ID or a timestamp.
     primary_key = "customer_id"
 
     def path(
-        self, stream_state: Mapping[str, Any] = None, stream_slice: Mapping[str, Any] = None, next_page_token: Mapping[str, Any] = None
+        self,
+        stream_state: Mapping[str, Any] = None,
+        stream_slice: Mapping[str, Any] = None,
+        next_page_token: Mapping[str, Any] = None,
     ) -> str:
         """
         TODO: Override this method to define the path this stream corresponds to. E.g. if the url is https://example-api.com/v1/customers then this
         should return "customers". Required.
         """
-        return "customers"
+        return self.base + "customers"
 
 
 # Basic incremental stream
@@ -131,7 +147,11 @@ class IncrementalScorebuddyStream(ScorebuddyStream, ABC):
         """
         return []
 
-    def get_updated_state(self, current_stream_state: MutableMapping[str, Any], latest_record: Mapping[str, Any]) -> Mapping[str, Any]:
+    def get_updated_state(
+        self,
+        current_stream_state: MutableMapping[str, Any],
+        latest_record: Mapping[str, Any],
+    ) -> Mapping[str, Any]:
         """
         Override to determine the latest state after reading the latest record. This typically compared the cursor_field from the latest record and
         the current state and picks the 'most' recent cursor. This is how a stream's state is determined. Required for incremental.
@@ -144,6 +164,10 @@ class Employees(IncrementalScorebuddyStream):
     TODO: Change class name to match the table/data source this stream corresponds to.
     """
 
+    def __init__(self, base: str, **kwargs):
+        super().__init__(**kwargs)
+        self.base = base
+
     # TODO: Fill in the cursor_field. Required.
     cursor_field = "start_date"
 
@@ -155,9 +179,11 @@ class Employees(IncrementalScorebuddyStream):
         TODO: Override this method to define the path this stream corresponds to. E.g. if the url is https://example-api.com/v1/employees then this should
         return "single". Required.
         """
-        return "employees"
+        return self.base + "employees"
 
-    def stream_slices(self, stream_state: Mapping[str, Any] = None, **kwargs) -> Iterable[Optional[Mapping[str, any]]]:
+    def stream_slices(
+        self, stream_state: Mapping[str, Any] = None, **kwargs
+    ) -> Iterable[Optional[Mapping[str, any]]]:
         """
         TODO: Optionally override this method to define this stream's slices. If slicing is not needed, delete this method.
 
@@ -193,7 +219,47 @@ class SourceScorebuddy(AbstractSource):
         :param logger:  logger object
         :return Tuple[bool, any]: (True, None) if the input config can be used to connect to the API successfully, (False, error) otherwise.
         """
-        return True, None
+        # Potentially not needed with the checks on ./spec.json
+        token_url = f'https://www.cloud.scorebuddy.co.uk/{config["api_hostname"]}authorisation/token'
+        try:
+            response = requests.post(
+                url=token_url,
+                headers={"Content-Type": "application/x-www-form-urlencoded"},
+                data={
+                    "grant_type": "client_credentials",
+                    "client_id": config["client_id"],
+                    "client_secret": config["client_secret"],
+                    "scope": "scores:read staff:read staff:write groups:read groups:write teams:read teams:write scorecards:read users:read users:write integrations:read integrations:write",
+                },
+            )
+            if response.status_code == requests.codes.ok:
+                return True, None
+            else:
+                response.raise_for_status()
+        except Exception as error:
+            return (
+                False,
+                f"Unable to connect to Scorebuddy API with the provided credentials - {repr(error)}",
+            )
+
+    def _convert_auth_to_token(
+        self, api_hostname: str, client_id: str, client_secret: str
+    ) -> str:
+        token_url = (
+            f"https://www.cloud.scorebuddy.co.uk/{api_hostname}authorisation/token"
+        )
+        response = requests.post(
+            url=token_url,
+            headers={"Content-Type": "application/x-www-form-urlencoded"},
+            data={
+                "grant_type": "client_credentials",
+                "client_id": client_id,
+                "client_secret": client_secret,
+                "scope": "scores:read staff:read staff:write groups:read groups:write teams:read teams:write scorecards:read users:read users:write integrations:read integrations:write",
+            },
+        )
+        access_token = response.json()["access_token"]
+        return access_token
 
     def streams(self, config: Mapping[str, Any]) -> List[Stream]:
         """
@@ -201,6 +267,22 @@ class SourceScorebuddy(AbstractSource):
 
         :param config: A Mapping of the user input configuration as defined in the connector spec.
         """
-        # TODO remove the authenticator if not required.
-        auth = TokenAuthenticator(token="api_key")  # Oauth2Authenticator is also available if you need oauth support
-        return [Customers(authenticator=auth), Employees(authenticator=auth)]
+
+        access_token = self._convert_auth_to_token(
+            api_hostname=config["api_hostname"],
+            client_id=config["client_id"],
+            client_secret=config["client_secret"],
+        )
+
+        auth = TokenAuthenticator(
+            token=access_token
+        ) 
+
+        args = {
+            "base": config["api_hostname"],
+        }
+
+        return [
+            Customers(authenticator=auth, **args),
+            Employees(authenticator=auth, **args),
+        ]
