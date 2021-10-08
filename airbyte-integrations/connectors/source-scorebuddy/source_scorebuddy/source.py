@@ -57,8 +57,7 @@ class ScorebuddyStream(HttpStream, ABC):
     See the reference docs for the full list of configurable options.
     """
 
-    # TODO: Fill in the url base. Required.
-    url_base = "www.cloud.scorebuddy.co.uk/"
+    url_base = "http://www.cloud.scorebuddy.co.uk/"
 
     def next_page_token(
         self, response: requests.Response
@@ -77,6 +76,13 @@ class ScorebuddyStream(HttpStream, ABC):
         :return If there is another page in the result, a mapping (e.g: dict) containing information needed to query the next page in the response.
                 If there are no more pages in the result, return None.
         """
+        # next_page_full_url = response.json()["next_page"]
+        # if next_page_full_url:
+        #     next_page_parsed = next_page_full_url.split("&")
+        #     next_page = [x.split("=")[1] for x in next_page_parsed if x.split("=")[0] == "page"]
+        #     next_page_int = int(next_page[0])
+        #     return {"page": next_page_int + 1}
+        # return {"page": None}
         return None
 
     def request_params(
@@ -101,17 +107,13 @@ class ScorebuddyStream(HttpStream, ABC):
         yield {}
 
 
-class Customers(ScorebuddyStream):
-    """
-    TODO: Change class name to match the table/data source this stream corresponds to.
-    """
+class Scorecards(ScorebuddyStream):
 
     def __init__(self, base: str, **kwargs):
         super().__init__(**kwargs)
         self.base = base
 
-    # TODO: Fill in the primary key. Required. This is usually a unique field in the stream, like an ID or a timestamp.
-    primary_key = "customer_id"
+    primary_key = "scorecard_id"
 
     def path(
         self,
@@ -119,11 +121,26 @@ class Customers(ScorebuddyStream):
         stream_slice: Mapping[str, Any] = None,
         next_page_token: Mapping[str, Any] = None,
     ) -> str:
-        """
-        TODO: Override this method to define the path this stream corresponds to. E.g. if the url is https://example-api.com/v1/customers then this
-        should return "customers". Required.
-        """
-        return self.base + "customers"
+        return self.base + "scorecards"
+
+    def request_params(
+            self,
+            stream_state: Mapping[str, Any],
+            stream_slice: Mapping[str, Any] = None,
+            next_page_token: Mapping[str, Any] = None,
+    ) -> MutableMapping[str, Any]:
+        return {'limit': 100}
+
+    def parse_response(
+            self,
+            response: requests.Response,
+            stream_state: Mapping[str, Any],
+            stream_slice: Mapping[str, Any] = None,
+            next_page_token: Mapping[str, Any] = None,
+    ) -> Iterable[Mapping]:
+        # The response is a simple JSON whose schema matches our stream's schema exactly, 
+        # so we just return a list containing the response
+        return [response.json()]
 
 
 # Basic incremental stream
@@ -134,7 +151,7 @@ class IncrementalScorebuddyStream(ScorebuddyStream, ABC):
     """
 
     # TODO: Fill in to checkpoint stream reads after N records. This prevents re-reading of data if the stream fails for any reason.
-    state_checkpoint_interval = None
+    state_checkpoint_interval = 5
 
     @property
     def cursor_field(self) -> str:
@@ -263,8 +280,6 @@ class SourceScorebuddy(AbstractSource):
 
     def streams(self, config: Mapping[str, Any]) -> List[Stream]:
         """
-        TODO: Replace the streams below with your own streams.
-
         :param config: A Mapping of the user input configuration as defined in the connector spec.
         """
 
@@ -283,6 +298,6 @@ class SourceScorebuddy(AbstractSource):
         }
 
         return [
-            Customers(authenticator=auth, **args),
-            Employees(authenticator=auth, **args),
+            Scorecards(authenticator=auth, **args),
+            # Employees(authenticator=auth, **args),
         ]

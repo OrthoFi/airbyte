@@ -1,0 +1,27 @@
+{
+  "streams": [
+    {
+      "stream": {
+        "name": "scorecards",
+        "json_schema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {
+            "scorecard_id": { "type": "integer" },
+            "scorecard_type": { "type": "string" },
+            "current_version": { "type": "integer" },
+            "number_of_versions": { "type": "integer" },
+            "locked": { "type": "boolean" },
+            "archived": { "type": "boolean" },
+            "deleted": { "type": "boolean" },
+            "versions": { "type": "array", "items": ["object"] },
+            "settings": { "type": "object", "properties": ["object"] }
+          }
+        },
+        "supported_sync_modes": ["full_refresh"]
+      },
+      "sync_mode": "full_refresh",
+      "destination_sync_mode": "overwrite"
+    }
+  ]
+}
