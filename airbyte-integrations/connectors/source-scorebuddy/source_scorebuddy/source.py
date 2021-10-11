@@ -143,9 +143,7 @@ class Scorecards(ScorebuddyStream):
             stream_slice: Mapping[str, Any] = None,
             next_page_token: Mapping[str, Any] = None,
     ) -> Iterable[Mapping]:
-        # The response is a simple JSON whose schema matches our stream's schema exactly, 
-        # so we just return a list containing the response
-        return [response.json()]
+        return response.json()["scorecard"]
 
 
 # Basic incremental stream
