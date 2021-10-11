@@ -44,7 +44,7 @@
                         "type": "string"
                     },
                     "department": {
-                        "type": "null"
+                        "type": "string"
                     },
                     "location": {
                         "type": "string"
@@ -203,7 +203,7 @@
                     "type": "boolean"
                 },
                 "agent_insight_short_label": {
-                    "type": "null"
+                    "type": "string"
                 },
                 "self_score_available": {
                     "type": "boolean"
