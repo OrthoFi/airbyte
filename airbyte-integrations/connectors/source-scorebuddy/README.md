@@ -130,3 +130,10 @@ You've checked out the repo, implemented a million dollar feature, and you're re
 1. Create a Pull Request.
 1. Pat yourself on the back for being an awesome contributor.
 1. Someone from Airbyte will take a look at your PR and iterate with you to merge it into master.
+
+### References
+If you are developing on this connector, install the [genson](https://github.com/wolverdude/GenSON) library and generate the JSONSchema quickly using:
+
+```bash
+genson -i 4 -$ https://json-schema.org/draft/2020-12/schema /path/to/json_file_example.json | > relative/path/to/schemas/directory/example.json
+```

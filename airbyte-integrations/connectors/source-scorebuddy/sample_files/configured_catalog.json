@@ -4,21 +4,280 @@
       "stream": {
         "name": "scorecards",
         "json_schema": {
-          "$schema": "http://json-schema.org/draft-07/schema#",
+          "$schema": "https://json-schema.org/draft/2020-12/schema",
           "type": "object",
           "properties": {
-            "scorecard_id": { "type": "integer" },
-            "scorecard_type": { "type": "string" },
-            "current_version": { "type": "integer" },
-            "number_of_versions": { "type": "integer" },
-            "locked": { "type": "boolean" },
-            "archived": { "type": "boolean" },
-            "deleted": { "type": "boolean" },
-            "versions": { "type": "array", "items": ["object"] },
-            "settings": { "type": "object", "properties": ["object"] }
-          }
+            "scorecard_id": {
+              "type": "integer"
+            },
+            "scorecard_type": {
+              "type": "string"
+            },
+            "current_version": {
+              "type": "integer"
+            },
+            "number_of_versions": {
+              "type": "integer"
+            },
+            "locked": {
+              "type": "boolean"
+            },
+            "archived": {
+              "type": "boolean"
+            },
+            "deleted": {
+              "type": "boolean"
+            },
+            "versions": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "version_number": {
+                    "type": "integer"
+                  },
+                  "scorecard_name": {
+                    "type": "string"
+                  },
+                  "category_id": {
+                    "type": "integer"
+                  },
+                  "group_id": {
+                    "type": "integer"
+                  },
+                  "description": {
+                    "type": "string"
+                  },
+                  "department": {
+                    "type": "null"
+                  },
+                  "location": {
+                    "type": "string"
+                  },
+                  "target": {
+                    "type": "integer"
+                  },
+                  "max_score": {
+                    "type": "integer"
+                  },
+                  "number_of_questions": {
+                    "type": "integer"
+                  },
+                  "questions": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "question_id": {
+                          "type": "integer"
+                        },
+                        "question_number": {
+                          "type": "integer"
+                        },
+                        "question": {
+                          "type": "string"
+                        },
+                        "section_id": {
+                          "type": "integer"
+                        },
+                        "weighting": {
+                          "type": "integer"
+                        },
+                        "max_score": {
+                          "type": "integer"
+                        },
+                        "fail_section": {
+                          "type": "boolean"
+                        },
+                        "fail_all_zeros": {
+                          "type": "boolean"
+                        },
+                        "cause_mandatory": {
+                          "type": "boolean"
+                        },
+                        "number_of_answers": {
+                          "type": "integer"
+                        },
+                        "answers": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "answer_key": {
+                                "type": "integer"
+                              },
+                              "answer_label": {
+                                "type": "string"
+                              },
+                              "answer_value": {
+                                "type": "integer"
+                              },
+                              "point_of_failure": {
+                                "type": "boolean"
+                              },
+                              "fail_section": {
+                                "type": "boolean"
+                              },
+                              "not_applicable": {
+                                "type": "boolean"
+                              },
+                              "cause_mandatory": {
+                                "type": "boolean"
+                              }
+                            },
+                            "required": [
+                              "answer_key",
+                              "answer_label",
+                              "answer_value",
+                              "cause_mandatory",
+                              "fail_section",
+                              "not_applicable",
+                              "point_of_failure"
+                            ]
+                          }
+                        },
+                        "causes": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "unique_rca_id": {
+                                "type": "integer"
+                              },
+                              "rca_id": {
+                                "type": "integer"
+                              },
+                              "rca_name": {
+                                "type": "string"
+                              },
+                              "deleted": {
+                                "type": "boolean"
+                              }
+                            },
+                            "required": [
+                              "deleted",
+                              "rca_id",
+                              "rca_name",
+                              "unique_rca_id"
+                            ]
+                          }
+                        }
+                      },
+                      "required": [
+                        "answers",
+                        "cause_mandatory",
+                        "causes",
+                        "fail_all_zeros",
+                        "fail_section",
+                        "max_score",
+                        "number_of_answers",
+                        "question",
+                        "question_id",
+                        "question_number",
+                        "section_id",
+                        "weighting"
+                      ]
+                    }
+                  }
+                },
+                "required": [
+                  "category_id",
+                  "department",
+                  "description",
+                  "group_id",
+                  "location",
+                  "max_score",
+                  "number_of_questions",
+                  "questions",
+                  "scorecard_name",
+                  "target",
+                  "version_number"
+                ]
+              }
+            },
+            "settings": {
+              "type": "object",
+              "properties": {
+                "fail_all_zeros": {
+                  "type": "boolean"
+                },
+                "fail_section_subtracts": {
+                  "type": "boolean"
+                },
+                "agent_insight_display": {
+                  "type": "boolean"
+                },
+                "agent_insight_short_label": {
+                  "type": "null"
+                },
+                "self_score_available": {
+                  "type": "boolean"
+                },
+                "multiple_comments": {
+                  "type": "boolean"
+                },
+                "multiple_rcas": {
+                  "type": "boolean"
+                },
+                "hide_score": {
+                  "type": "boolean"
+                },
+                "point_of_failure_email": {
+                  "type": "boolean"
+                },
+                "compliance_failure_email": {
+                  "type": "boolean"
+                },
+                "question_order": {
+                  "type": "boolean"
+                },
+                "default_event_date": {
+                  "type": "boolean"
+                },
+                "event_reference_mandatory": {
+                  "type": "boolean"
+                },
+                "event_types_mandatory": {
+                  "type": "boolean"
+                },
+                "event_duration_mandatory": {
+                  "type": "boolean"
+                }
+              },
+              "required": [
+                "agent_insight_display",
+                "agent_insight_short_label",
+                "compliance_failure_email",
+                "default_event_date",
+                "event_duration_mandatory",
+                "event_reference_mandatory",
+                "event_types_mandatory",
+                "fail_all_zeros",
+                "fail_section_subtracts",
+                "hide_score",
+                "multiple_comments",
+                "multiple_rcas",
+                "point_of_failure_email",
+                "question_order",
+                "self_score_available"
+              ]
+            }
+          },
+          "required": [
+            "archived",
+            "current_version",
+            "deleted",
+            "locked",
+            "number_of_versions",
+            "scorecard_id",
+            "scorecard_type",
+            "settings",
+            "versions"
+          ]
         },
-        "supported_sync_modes": ["full_refresh"]
+        "supported_sync_modes": [
+          "full_refresh"
+        ]
       },
       "sync_mode": "full_refresh",
       "destination_sync_mode": "overwrite"
