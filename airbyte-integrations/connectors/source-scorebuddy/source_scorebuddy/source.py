@@ -76,14 +76,12 @@ class ScorebuddyStream(HttpStream, ABC):
         :return If there is another page in the result, a mapping (e.g: dict) containing information needed to query the next page in the response.
                 If there are no more pages in the result, return None.
         """
-        # next_page_full_url = response.json()["next_page"]
-        # if next_page_full_url:
-        #     next_page_parsed = next_page_full_url.split("&")
-        #     next_page = [x.split("=")[1] for x in next_page_parsed if x.split("=")[0] == "page"]
-        #     next_page_int = int(next_page[0])
-        #     return {"page": next_page_int + 1}
-        # return {"page": None}
-        return None
+        next_page_full_url = response.json().get("next_page")
+        if next_page_full_url:
+            next_page_parsed = next_page_full_url.split("&")
+            next_page = [x.split("=")[1] for x in next_page_parsed if x.split("=")[0] == "page"]
+            next_page_int = int(next_page[0])
+            return {"page": next_page_int}
 
     def request_params(
         self,
@@ -113,6 +111,7 @@ class Scorecards(ScorebuddyStream):
         super().__init__(**kwargs)
         self.base = base
 
+
     primary_key = "scorecard_id"
 
     def path(
@@ -129,7 +128,13 @@ class Scorecards(ScorebuddyStream):
             stream_slice: Mapping[str, Any] = None,
             next_page_token: Mapping[str, Any] = None,
     ) -> MutableMapping[str, Any]:
-        return {'limit': 100}
+
+        params = {'limit': 100}
+
+        if next_page_token:
+            params.update(next_page_token)
+
+        return params
 
     def parse_response(
             self,
