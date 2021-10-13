@@ -63,3 +63,4 @@ resources/examples/airflow/logs/*
 
 # IDE config
 .vscode/*
+
