@@ -62,4 +62,4 @@ resources/examples/airflow/logs/*
 !airbyte-webapp/src/packages/cloud/data
 
 # IDE config
-.vscode/
+.vscode/*
