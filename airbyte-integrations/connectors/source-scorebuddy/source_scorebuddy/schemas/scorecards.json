@@ -3,16 +3,16 @@
     "type": "object",
     "properties": {
         "scorecard_id": {
-            "type": "integer"
+            "type": "number"
         },
         "scorecard_type": {
             "type": "string"
         },
         "current_version": {
-            "type": "integer"
+            "type": "number"
         },
         "number_of_versions": {
-            "type": "integer"
+            "type": "number"
         },
         "locked": {
             "type": "boolean"
@@ -29,16 +29,16 @@
                 "type": "object",
                 "properties": {
                     "version_number": {
-                        "type": "integer"
+                        "type": "number"
                     },
                     "scorecard_name": {
                         "type": "string"
                     },
                     "category_id": {
-                        "type": "integer"
+                        "type": "number"
                     },
                     "group_id": {
-                        "type": "integer"
+                        "type": "number"
                     },
                     "description": {
                         "type": "string"
@@ -50,13 +50,13 @@
                         "type": "string"
                     },
                     "target": {
-                        "type": "integer"
+                        "type": "number"
                     },
                     "max_score": {
-                        "type": "integer"
+                        "type": "number"
                     },
                     "number_of_questions": {
-                        "type": "integer"
+                        "type": "number"
                     },
                     "questions": {
                         "type": "array",
@@ -64,22 +64,22 @@
                             "type": "object",
                             "properties": {
                                 "question_id": {
-                                    "type": "integer"
+                                    "type": "number"
                                 },
                                 "question_number": {
-                                    "type": "integer"
+                                    "type": "number"
                                 },
                                 "question": {
                                     "type": "string"
                                 },
                                 "section_id": {
-                                    "type": "integer"
+                                    "type": "number"
                                 },
                                 "weighting": {
-                                    "type": "integer"
+                                    "type": "number"
                                 },
                                 "max_score": {
-                                    "type": "integer"
+                                    "type": "number"
                                 },
                                 "fail_section": {
                                     "type": "boolean"
@@ -91,7 +91,7 @@
                                     "type": "boolean"
                                 },
                                 "number_of_answers": {
-                                    "type": "integer"
+                                    "type": "number"
                                 },
                                 "answers": {
                                     "type": "array",
@@ -99,13 +99,13 @@
                                         "type": "object",
                                         "properties": {
                                             "answer_key": {
-                                                "type": "integer"
+                                                "type": "number"
                                             },
                                             "answer_label": {
                                                 "type": "string"
                                             },
                                             "answer_value": {
-                                                "type": "integer"
+                                                "type": "number"
                                             },
                                             "point_of_failure": {
                                                 "type": "boolean"
@@ -137,10 +137,10 @@
                                         "type": "object",
                                         "properties": {
                                             "unique_rca_id": {
-                                                "type": "integer"
+                                                "type": "number"
                                             },
                                             "rca_id": {
-                                                "type": "integer"
+                                                "type": "number"
                                             },
                                             "rca_name": {
                                                 "type": "string"
